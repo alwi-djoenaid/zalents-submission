@@ -1,6 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
 
+import {Router, Route, Switch, Redirect, withRouter} from "react-router-dom";
+
+import Appbar from './components/Layout/Appbar.js';
+import Layout from './components/Layout/Layout';
+
+import Homepage from './components/Homepage';
+import Aboutme from './components/Aboutme';
+import Auth from './components/Auth';
+import AuthContainer from './container/AuthContainer';
+import TodoContainer from './container/TodoContainer';
+import { useEffect } from 'react';
+import localforage from 'localforage';
+
 function App() {
   return (
     <div className="App">
@@ -22,4 +35,52 @@ function App() {
   );
 }
 
-export default App;
+function App2(props){
+  const authContainer = AuthContainer.useContainer()
+  let routes;
+  let privateRoutes;
+
+  useEffect(() => {
+    props.history.push(props.location);
+    authContainer.onTryAutoSignIn()
+      .then(() => {
+        setTimeout(() => {
+          
+        }, 3000);
+      })
+      .catch(() => {
+        authContainer.logout();
+      })
+  }, []);
+
+  const checkToken = () => {
+  }
+
+  routes = (
+    <Switch>
+      <Route path="/auth" exact component={Auth} />
+      <Redirect to="/auth" />
+    </Switch>
+  );
+
+  privateRoutes = (
+    <TodoContainer.Provider>
+      <Layout>
+        <Switch>
+          <Route path="/home" exact component={Homepage} />
+          <Route path="/aboutme" exact component={Aboutme} />
+          <Route path="/auth" exact component={Auth} />
+          <Redirect to="/home" />
+        </Switch>
+      </Layout>
+    </TodoContainer.Provider>
+  );
+
+  return(
+    <>
+      {authContainer.isAuthenticated ? privateRoutes : routes}
+    </>
+  );
+}
+
+export default withRouter(App2);
