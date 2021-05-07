@@ -11,6 +11,10 @@ function useTodo(props){
     const [task, setTask] = useState([]);
     const [taskList, setTaskList] = useState([]);
 
+    const [selectedTaskGroup, setSelectedTaskGroup] = useState();
+    const [taskListName, setTaskListName] = useState("");
+    const [taskListProgress, setTaskListProgress] = useState();
+
     const getTodoList = () => {
         return todoService.getTodoList()
     }
@@ -19,11 +23,25 @@ function useTodo(props){
         return todoService.getTaskList(todoId)
     }
 
+    const createTaskItem = (todoId) => {
+        let payload = {
+            name: taskListName,
+            progress_percentage: taskListProgress
+        }
+        return await todoService.createTaskList(todoId)
+    }
+
     return{
         task, 
         setTask,
         taskList, 
         setTaskList,
+        selectedTaskGroup, 
+        setSelectedTaskGroup,
+        taskListName, 
+        setTaskListName,
+        taskListProgress, 
+        setTaskListProgress,
         anchorElement,
         setAnchorElement,
         open, 
