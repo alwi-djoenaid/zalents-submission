@@ -32,7 +32,7 @@ function useTodo(props){
             name: taskListName,
             progress_percentage: taskListProgress
         };
-        console.log(payload)
+        //console.log(payload)
         return await todoService.createTaskList(todoId, payload);
     }
 
@@ -41,7 +41,7 @@ function useTodo(props){
             target_todo_id: targetTaskListParent,
             name: taskListName
         }
-        console.log(payload)
+        //console.log(payload)
         return await todoService.editTaskList(taskListParentId, taskListId, payload);
     }
 

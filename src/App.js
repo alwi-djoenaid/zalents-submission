@@ -7,7 +7,6 @@ import Appbar from './components/Layout/Appbar.js';
 import Layout from './components/Layout/Layout';
 
 import Homepage from './components/Homepage';
-import Aboutme from './components/Aboutme';
 import Auth from './components/Auth';
 import AuthContainer from './container/AuthContainer';
 import TodoContainer from './container/TodoContainer';
@@ -54,8 +53,8 @@ function App2(props){
 
   routes = (
     <Switch>
-      <Route path="/auth" exact component={Auth} />
-      <Redirect to="/auth" />
+      <Route path="/v1/auth" exact component={Auth} />
+      <Redirect to="/v1/auth" />
     </Switch>
   );
 
@@ -63,10 +62,8 @@ function App2(props){
     <TodoContainer.Provider>
       <Layout>
         <Switch>
-          <Route path="/home" exact component={Homepage} />
-          <Route path="/aboutme" exact component={Aboutme} />
-          <Route path="/auth" exact component={Auth} />
-          <Redirect to="/home" />
+          <Route path="/v1/home" exact component={Homepage} />
+          <Redirect to="/v1/home" />
         </Switch>
       </Layout>
     </TodoContainer.Provider>

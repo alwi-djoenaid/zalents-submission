@@ -189,7 +189,6 @@ const Homepage = props => {
 
     const handleOpenModalAddTask = (selected) => {
         TodoContainer.setSelectedTaskGroup(selected.currentTarget.value);
-        console.log(selected.currentTarget.value);
         setEditModalClicked(false);
         setOpenModal(true);
     };
@@ -231,7 +230,6 @@ const Homepage = props => {
         .then(response => {
             const {data} = response;
             TodoContainer.setTask(data)
-            console.log(TodoContainer.task)
             data.map(todo => {
                 TodoContainer.getTaskItem(todo.id)
                     .then(response => {
@@ -250,24 +248,22 @@ const Homepage = props => {
         TodoContainer.setTaskListId(id)
         TodoContainer.setTaskListParent(taskListParent);
         TodoContainer.setTargetTaskListParent(index);
-        console.log(index - 1, index + 1)
         TodoContainer.setTaskListName(name);
         
         targetParentIndex = index;
-        setTaskParent(index);
+        setTaskParent(index - 1);
+        // console.log(taskParent)
+        // console.log(index)
         setAnchorEl(event.currentTarget);
 
-        console.log(taskParent);
-        console.log(TodoContainer.task[taskParent]);
-        console.log(name);
-        console.log(index);
-        console.log(taskListParent);
-        console.log(TodoContainer.targetTaskListParent)
+        // console.log(TodoContainer.task)
+        // console.log(taskParent);
+        // console.log(TodoContainer.task[taskParent]);
+        // console.log(TodoContainer.targetTaskListParent)
     };
 
     const createTaskItem = async () => {
         if(TodoContainer.taskListName || TodoContainer.taskListProgress){
-            console.log(TodoContainer.taskListName)
             TodoContainer.setInputValid(true)
             await TodoContainer.createTaskItem(TodoContainer.selectedTaskGroup)
                 .then(response => {
@@ -290,11 +286,9 @@ const Homepage = props => {
     const editTaskItem = async () => {
         await TodoContainer.editTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
             .then(response => {
-                console.log(response)
                 if(response.status == 200){
                     //TodoContainer.setOpenSnackbar(true);
                     setTimeout(() => {
-                        //loadData();
                         //window.location.reload()
                     }, 2000);
                 }
@@ -305,26 +299,21 @@ const Homepage = props => {
     }
 
     const moveRight = () => {
-        TodoContainer.setTargetTaskListParent(TodoContainer.taskListParent + 1);
-        console.log(TodoContainer.targetTaskListParent)
+        TodoContainer.setTargetTaskListParent(TodoContainer.task[TodoContainer.targetTaskListParent + 1]);
         
-        console.log(TodoContainer.task[taskParent]);
-        console.log(TodoContainer.targetTaskListParent);
-        setTimeout(() => {
-            editTaskItem();
-        }, 2000);
+        // setTimeout(() => {
+        //     editTaskItem();
+        // }, 2000);
         
     }
 
     const moveLeft = async () => {
         await TodoContainer.setTargetTaskListParent(TodoContainer.task[taskParent - 1].id);
-        console.log(TodoContainer.targetTaskListParent)
-        await editTaskItem();
+        //console.log(TodoContainer.targetTaskListParent)
+        //await editTaskItem();
     }
 
     const deleteTaskItem = async () => {
-        console.log(TodoContainer.taskListParent)
-        console.log(TodoContainer.taskListId);
         await TodoContainer.deleteTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
             .then(response => {
                 setTimeout(() => {
