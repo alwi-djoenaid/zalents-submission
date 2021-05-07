@@ -171,7 +171,9 @@ const Homepage = props => {
     const [openModal, setOpenModal] = useState(false);
     let subTask = [];
 
-    const handleOpen = () => {
+    const handleOpen = (selected) => {
+        TodoContainer.setSelectedTaskGroup(selected.currentTarget.value);
+        console.log(selected.target.value, TodoContainer.selectedTaskGroup);
         setOpenModal(true);
     };
 
@@ -213,6 +215,10 @@ const Homepage = props => {
         loadData()
         
     }, [])
+
+    const createTaskItem = async () => {
+        return await TodoContainer.createTaskItem(TodoContainer.selectedTaskGroup)
+    }
 
     return(
         <div className={classes.root}>
@@ -300,7 +306,7 @@ const Homepage = props => {
                                                 }
                                             </div>
                                         )}
-                                            <Button type="button" onClick={handleOpen}>
+                                            <Button value={task.id} type="button" onClick={selected => handleOpen(selected)}>
                                                 <div className={classes.addBtn}>
                                                     <div>
                                                         <img src={AddIcon}/>
@@ -335,17 +341,27 @@ const Homepage = props => {
                         <div>
                             <div >
                                 <p style={{marginBottom: '4px'}}>Task Name</p>
-                                <TextField placeholder="example: Build rocket to Mars." variant="outlined" style={{width: '100%'}}></TextField>
+                                <TextField value={TodoContainer.taskListName} 
+                                            onChange={e => TodoContainer.setTaskListName(e.target.value)} 
+                                            placeholder="example: Build rocket to Mars." 
+                                            variant="outlined" 
+                                            style={{width: '100%'}}>
+                                </TextField>
                             </div>
                             <div >
                                 <p style={{marginBottom: '4px'}}>Progress</p>
-                                <TextField placeholder="0%" variant="outlined" style={{width: '100px'}}></TextField>
+                                <TextField value={TodoContainer.taskListProgress} 
+                                            onChange={e => TodoContainer.setTaskListProgress(e.target.value)} 
+                                            placeholder="0%" 
+                                            variant="outlined" 
+                                            style={{width: '100px'}}>
+                                </TextField>
                             </div>
                             <div style={{paddingTop: '10px', float: 'right'}}>
-                                <Button variant="contained" style={{backgroundColor: '#FFFFFF', borderColor: '1px solid', color: '#262626', marginRight: '8px'}}>
+                                <Button onClick={handleClose} variant="contained" style={{backgroundColor: '#FFFFFF', borderColor: '1px solid', color: '#262626', marginRight: '8px'}}>
                                     Cancel
                                 </Button>
-                                <Button variant="contained" style={{backgroundColor: '#27AE60', color: '#FFFFFF'}}>
+                                <Button onClick={() => createTaskItem()} variant="contained" style={{backgroundColor: '#27AE60', color: '#FFFFFF'}}>
                                     Save Task
                                 </Button>
                             </div>

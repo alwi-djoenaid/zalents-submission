@@ -27,10 +27,10 @@ export default class TodoService{
         return response;
     }
 
-    async createTaskList(todoId){
+    async createTaskList(todoId, data){
         let response;
         try{
-            response = await axios.post(`https://todos-project-api.herokuapp.com/todos/${todoId}/items`)
+            response = await axios.post(`https://todos-project-api.herokuapp.com/todos/${todoId}/items`, data)
         } catch(e) {
             console.warn(e)
         }
