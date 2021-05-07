@@ -7,6 +7,8 @@ function useTodo(props){
     const todoService = new TodoService();
     const [anchorElement, setAnchorElement] = useState(null);
     const [open, setOpen] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [inputValid, setInputValid] = useState(false);
 
     const [task, setTask] = useState([]);
     const [taskList, setTaskList] = useState([]);
@@ -47,6 +49,10 @@ function useTodo(props){
         setAnchorElement,
         open, 
         setOpen,
+        openSnackbar, 
+        setOpenSnackbar,
+        inputValid, 
+        setInputValid,
         getTodoList,
         getTaskItem,
         createTaskItem

@@ -53,9 +53,6 @@ function App2(props){
       })
   }, []);
 
-  const checkToken = () => {
-  }
-
   routes = (
     <Switch>
       <Route path="/auth" exact component={Auth} />

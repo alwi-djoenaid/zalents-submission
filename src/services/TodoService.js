@@ -34,6 +34,7 @@ export default class TodoService{
         } catch(e) {
             console.warn(e)
         }
+        console.log(response)
         return response;
     }
 

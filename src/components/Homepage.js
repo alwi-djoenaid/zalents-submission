@@ -1,4 +1,4 @@
-import { Backdrop, Button, Card, CardContent, ClickAwayListener, Container, Fade, Grid, Grow, Menu, MenuItem, MenuList, Modal, Paper, Popper, TextField, Typography } from '@material-ui/core';
+import { Backdrop, Button, Card, CardContent, ClickAwayListener, Container, Fade, Grid, Grow, Menu, MenuItem, MenuList, Modal, Paper, Popper, Snackbar, TextField, Typography } from '@material-ui/core';
 import React, { useEffect , useRef, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import OptionIcon from '../assets/images/dots.png';
@@ -7,6 +7,7 @@ import DoneIcon from '../assets/images/checklist.png';
 import CircleIcon from '../assets/images/circle.png';
 import PlusIcon from '../assets/images/plus.png';
 import AddIcon from '../assets/images/AddIcon.png';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const styles = makeStyles(theme => ({
     root: {
@@ -154,6 +155,13 @@ const styles = makeStyles(theme => ({
         boxShadow: '0px 6px 16px 0px #00000014',
         boxShadow: '0px 9px 28px 8px #0000000D'
     },
+    modalTitle: {
+        marginTop: '12px',
+        color: '#262626',
+        fontSize: '16px',
+        lineHeight: '24px',
+        fontWeight: 'bold'
+    },
     modalTextField: {
         padding: '10px'
     }
@@ -188,6 +196,14 @@ const Homepage = props => {
     const openMenu = () => {
     }
 
+    const closeSnackbar = () => {
+        TodoContainer.setOpenSnackbar(false)
+    }
+
+    const Alert = props => {
+        return <MuiAlert elevation={6} variant="filled" {...props} />;
+    }
+
 
     useEffect(() => {
         const loadData = async () => {
@@ -200,11 +216,6 @@ const Homepage = props => {
                         .then(response => {
                             subTask.push(response.data);
                             TodoContainer.setTaskList(prevState => [...prevState, ...response.data])
-                            // console.log(TodoContainer.taskList)
-                            // console.log(subTask.length);
-                            // console.log(subTask);
-                            // console.log(subTask[0][0].todo_id);
-                            // console.log(...subTask);
                         })
                     
                 })
@@ -217,7 +228,24 @@ const Homepage = props => {
     }, [])
 
     const createTaskItem = async () => {
-        return await TodoContainer.createTaskItem(TodoContainer.selectedTaskGroup)
+        if(TodoContainer.taskListName || TodoContainer.taskListProgress){
+            console.log(TodoContainer.taskListName)
+            TodoContainer.setInputValid(true)
+            await TodoContainer.createTaskItem(TodoContainer.selectedTaskGroup)
+                .then(response => {
+                    if(response.status == 201) {
+                        TodoContainer.setOpenSnackbar(true);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 4000);
+                    }
+                })
+                .catch(response => {
+                    console.log(response);
+                })
+        } else {
+            TodoContainer.setOpenSnackbar(true);
+        }
     }
 
     return(
@@ -337,7 +365,7 @@ const Homepage = props => {
             >
                 <Fade in={openModal}>
                     <div className={classes.paper}>
-                        <h2 id="transition-modal-title">Create Task</h2>
+                        <Typography className={classes.modalTitle} id="transition-modal-title">Create Task</Typography>
                         <div>
                             <div >
                                 <p style={{marginBottom: '4px'}}>Task Name</p>
@@ -369,6 +397,15 @@ const Homepage = props => {
                     </div>
                 </Fade>
             </Modal>
+            <Snackbar open={TodoContainer.openSnackbar} onClose={closeSnackbar} autoHideDuration={6000} anchorOrigin={{vertical: 'top', horizontal: 'center'}}>
+                {TodoContainer.inputValid ? 
+                   <Alert severity="success">Task list has been created.</Alert> 
+                   : 
+                   <Alert severity="error">You are required to fill all of the input fields!</Alert>
+                }
+                {/* <Alert severity="success">Task list has been deleted.</Alert>
+                <Alert severity="success">Task list has been updated.</Alert> */}
+            </Snackbar>
         </div>
         
     );

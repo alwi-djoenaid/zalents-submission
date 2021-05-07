@@ -18,14 +18,17 @@ import './fonts/Rubik-Black.ttf';
 
 const theme = createMuiTheme({
   typography: {
-    fontFamily: 'Rubik'
-  }
+    fontFamily: 'Rubik, sans-serif'
+  },
+  // button: {
+  //   fontFamily: 'Rubik, sans-serif'
+  // }
 })
 
 const app = (
   <BrowserRouter>
     <CssBaseline>
-      <MuiThemeProvider>
+      <MuiThemeProvider theme={theme}>
         <AuthContainer.Provider>
           <App />
         </AuthContainer.Provider>
