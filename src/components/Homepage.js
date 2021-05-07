@@ -226,46 +226,44 @@ const Homepage = props => {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
     }
 
-    useEffect(() => {
-        const loadData = async () => {
-            TodoContainer.getTodoList()
-            .then(response => {
-                const {data} = response;
-                TodoContainer.setTask(data)
-                console.log(TodoContainer.task)
-                data.map(todo => {
-                    TodoContainer.getTaskItem(todo.id)
-                        .then(response => {
-                            subTask.push(response.data);
-                            TodoContainer.setTaskList(prevState => [...prevState, ...response.data])
-                        })
-                    
-                })
+    const loadData = async () => {
+        TodoContainer.getTodoList()
+        .then(response => {
+            const {data} = response;
+            TodoContainer.setTask(data)
+            console.log(TodoContainer.task)
+            data.map(todo => {
+                TodoContainer.getTaskItem(todo.id)
+                    .then(response => {
+                        subTask.push(response.data);
+                        TodoContainer.setTaskList(prevState => [...prevState, ...response.data])
+                    })
             })
-        };
+        })
+    };
+
+    useEffect(() => {
         loadData();
     }, [])
 
     const handleClick = (event, id, taskListParent, index, name) => {
-        // TodoContainer.setTaskListId(id)
-        // TodoContainer.setTaskListParent(taskListParent);
-        // console.log(name)
-        // console.log(index)
-        // targetParentIndex = index;
-        // setTaskParent(index);
-        // console.log(taskParent);
-        // console.log(TodoContainer.task[taskParent]);
+        TodoContainer.setTaskListId(id)
+        TodoContainer.setTaskListParent(taskListParent);
+        TodoContainer.setTargetTaskListParent(index);
+        console.log(index - 1, index + 1)
+        TodoContainer.setTaskListName(name);
+        
+        targetParentIndex = index;
+        setTaskParent(index);
         setAnchorEl(event.currentTarget);
-        changeState(id, name, index, taskListParent)
-    };
 
-    const changeState = async (id, name, index, taskListParent) => {
-        await TodoContainer.setTaskListId(id);
-        await setTaskParent(index);
+        console.log(taskParent);
+        console.log(TodoContainer.task[taskParent]);
         console.log(name);
-        await TodoContainer.setTaskListParent(taskListParent);
-        await console.log(TodoContainer.taskListId);
-    }
+        console.log(index);
+        console.log(taskListParent);
+        console.log(TodoContainer.targetTaskListParent)
+    };
 
     const createTaskItem = async () => {
         if(TodoContainer.taskListName || TodoContainer.taskListProgress){
@@ -296,41 +294,26 @@ const Homepage = props => {
                 if(response.status == 200){
                     //TodoContainer.setOpenSnackbar(true);
                     setTimeout(() => {
-                        window.location.reload();
-                    }, 4000);
+                        //loadData();
+                        //window.location.reload()
+                    }, 2000);
                 }
             })
             .catch(response => {
                 console.log(response);
             })
-
-        // if(TodoContainer.taskListName){
-        //     TodoContainer.setInputValid(true);
-            
-        //     await TodoContainer.editTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
-        //         .then(response => {
-        //             console.log(response)
-        //             if(response.status == 200){
-        //                 TodoContainer.setOpenSnackbar(true);
-        //                 setTimeout(() => {
-        //                     window.location.reload();
-        //                 }, 4000);
-        //             }
-        //         })
-        //         .catch(response => {
-        //             console.log(response);
-        //         })
-        // } else {
-        //     TodoContainer.setInputValid(false);
-        //     TodoContainer.setOpenSnackbar(true);
-        // }
     }
 
-
-    const moveRight = async () => {
-        await TodoContainer.setTargetTaskListParent(TodoContainer.task[taskParent + 1].id);
+    const moveRight = () => {
+        TodoContainer.setTargetTaskListParent(TodoContainer.taskListParent + 1);
         console.log(TodoContainer.targetTaskListParent)
-        await editTaskItem();
+        
+        console.log(TodoContainer.task[taskParent]);
+        console.log(TodoContainer.targetTaskListParent);
+        setTimeout(() => {
+            editTaskItem();
+        }, 2000);
+        
     }
 
     const moveLeft = async () => {
@@ -428,7 +411,7 @@ const Homepage = props => {
                                                                             aria-label="show more"
                                                                             aria-haspopup="true"
                                                                             aria-controls="toolbar"
-                                                                            onClick={e => handleClick(e, taskList.id, taskList.todo_id, i, taskList.name)}>
+                                                                            onClick={e => handleClick(e, taskList.id, taskList.todo_id, task.id, taskList.name)}>
                                                                         <img className={classes.btn} src={OptionIcon} />
                                                                     </IconButton>
                                                                 </div>

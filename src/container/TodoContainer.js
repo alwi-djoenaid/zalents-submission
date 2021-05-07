@@ -42,7 +42,7 @@ function useTodo(props){
             name: taskListName
         }
         console.log(payload)
-        //return await todoService.editTaskList(taskListParentId, taskListId, payload);
+        return await todoService.editTaskList(taskListParentId, taskListId, payload);
     }
 
     const deleteTaskList = async (taskListParentId, taskListId) => {
