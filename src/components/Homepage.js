@@ -289,7 +289,7 @@ const Homepage = props => {
                 if(response.status == 200){
                     //TodoContainer.setOpenSnackbar(true);
                     setTimeout(() => {
-                        //window.location.reload()
+                        window.location.reload()
                     }, 2000);
                 }
             })
