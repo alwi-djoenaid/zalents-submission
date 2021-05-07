@@ -182,12 +182,14 @@ const Homepage = props => {
     const id = open ? 'simple-popper' : undefined;
     const [openModal, setOpenModal] = useState(false);
     const [openModalDeleteTask, setOpenModalDeleteTask] = useState(false);
-    const [editModalClicked, setEditModalClicked] = useState(false)
+    const [editModalClicked, setEditModalClicked] = useState(false);
+    const [taskParent, setTaskParent] = useState();
     let subTask = [];
+    let targetParentIndex;
 
     const handleOpenModalAddTask = (selected) => {
-        TodoContainer.setSelectedTaskGroup(selected.target.value);
-        console.log(selected.target.value, TodoContainer.selectedTaskGroup);
+        TodoContainer.setSelectedTaskGroup(selected.currentTarget.value);
+        console.log(selected.currentTarget.value);
         setEditModalClicked(false);
         setOpenModal(true);
     };
@@ -208,14 +210,6 @@ const Homepage = props => {
     const handleCloseModalDeleteTask = () => {
         setOpenModalDeleteTask(false);
     }
-
-    const handleClick = (event, id, taskListParent, todoId) => {
-        TodoContainer.setTaskListId(id)
-        TodoContainer.setTaskListParent(taskListParent);
-        TodoContainer.setTargetTaskListParent(todoId);
-        console.log(TodoContainer.taskListParent, TodoContainer.targetTaskListParent)
-        setAnchorEl(event.currentTarget);
-      };
 
     const handleMenuClose = () => {
         setAnchorEl(null);
@@ -238,6 +232,7 @@ const Homepage = props => {
             .then(response => {
                 const {data} = response;
                 TodoContainer.setTask(data)
+                console.log(TodoContainer.task)
                 data.map(todo => {
                     TodoContainer.getTaskItem(todo.id)
                         .then(response => {
@@ -250,6 +245,27 @@ const Homepage = props => {
         };
         loadData();
     }, [])
+
+    const handleClick = (event, id, taskListParent, index, name) => {
+        // TodoContainer.setTaskListId(id)
+        // TodoContainer.setTaskListParent(taskListParent);
+        // console.log(name)
+        // console.log(index)
+        // targetParentIndex = index;
+        // setTaskParent(index);
+        // console.log(taskParent);
+        // console.log(TodoContainer.task[taskParent]);
+        setAnchorEl(event.currentTarget);
+        changeState(id, name, index, taskListParent)
+    };
+
+    const changeState = async (id, name, index, taskListParent) => {
+        await TodoContainer.setTaskListId(id);
+        await setTaskParent(index);
+        console.log(name);
+        await TodoContainer.setTaskListParent(taskListParent);
+        await console.log(TodoContainer.taskListId);
+    }
 
     const createTaskItem = async () => {
         if(TodoContainer.taskListName || TodoContainer.taskListProgress){
@@ -274,26 +290,53 @@ const Homepage = props => {
     }
 
     const editTaskItem = async () => {
-        if(TodoContainer.taskListName){
-            TodoContainer.setInputValid(true);
+        await TodoContainer.editTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
+            .then(response => {
+                console.log(response)
+                if(response.status == 200){
+                    //TodoContainer.setOpenSnackbar(true);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 4000);
+                }
+            })
+            .catch(response => {
+                console.log(response);
+            })
+
+        // if(TodoContainer.taskListName){
+        //     TodoContainer.setInputValid(true);
             
-            await TodoContainer.editTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
-                .then(response => {
-                    console.log(response)
-                    if(response.status == 200){
-                        TodoContainer.setOpenSnackbar(true);
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 4000);
-                    }
-                })
-                .catch(response => {
-                    console.log(response);
-                })
-        } else {
-            TodoContainer.setInputValid(false);
-            TodoContainer.setOpenSnackbar(true);
-        }
+        //     await TodoContainer.editTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
+        //         .then(response => {
+        //             console.log(response)
+        //             if(response.status == 200){
+        //                 TodoContainer.setOpenSnackbar(true);
+        //                 setTimeout(() => {
+        //                     window.location.reload();
+        //                 }, 4000);
+        //             }
+        //         })
+        //         .catch(response => {
+        //             console.log(response);
+        //         })
+        // } else {
+        //     TodoContainer.setInputValid(false);
+        //     TodoContainer.setOpenSnackbar(true);
+        // }
+    }
+
+
+    const moveRight = async () => {
+        await TodoContainer.setTargetTaskListParent(TodoContainer.task[taskParent + 1].id);
+        console.log(TodoContainer.targetTaskListParent)
+        await editTaskItem();
+    }
+
+    const moveLeft = async () => {
+        await TodoContainer.setTargetTaskListParent(TodoContainer.task[taskParent - 1].id);
+        console.log(TodoContainer.targetTaskListParent)
+        await editTaskItem();
     }
 
     const deleteTaskItem = async () => {
@@ -302,7 +345,7 @@ const Homepage = props => {
         await TodoContainer.deleteTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
             .then(response => {
                 setTimeout(() => {
-                   window.location.reload() 
+                   window.location.reload();
                 }, 1000);
             })
             .catch(response => {
@@ -319,8 +362,9 @@ const Homepage = props => {
             open={open}
             onClose={handleMenuClose}
         >
-            <MenuItem className={classes.menuText}>Move Left</MenuItem>
-            <MenuItem className={classes.menuText}>Move Right</MenuItem>
+            
+            <MenuItem className={classes.menuText} onClick={moveLeft}>Move Left</MenuItem>
+            <MenuItem className={classes.menuText} onClick={moveRight}>Move Right</MenuItem>
             <MenuItem className={classes.menuText} onClick={handleOpenModalEditTask}>Edit</MenuItem>
             <MenuItem className={classes.menuText} onClick={handleOpenModalDeleteTask}>Delete</MenuItem>
 
@@ -362,9 +406,12 @@ const Homepage = props => {
                                                             <div className={classes.utility}>
                                                                 <div className={classes.progressDisplay}>
                                                                     <div className={classes.progressBar}>
-                                                                        <div className={classes.progressPercentage} style={{width: `${taskList.progress_percentage}%`, 
-                                                                            backgroundColor:  `${taskList.progress_percentage == 100 ? '#52C41A' : '#1890FF'}`}}>
-                                                                        </div>
+                                                                        {taskList.progress_percentage >=0 && taskList.progress_percentage && 
+                                                                            <div className={classes.progressPercentage} style={{width: `${taskList.progress_percentage}%`, 
+                                                                                backgroundColor:  `${taskList.progress_percentage == 100 ? '#52C41A' : '#1890FF'}`}}>
+                                                                            </div>
+                                                                        }
+                                                                        
                                                                     </div>
                                                                     
                                                                     <div className={classes.percentageNumber}>
@@ -381,7 +428,7 @@ const Homepage = props => {
                                                                             aria-label="show more"
                                                                             aria-haspopup="true"
                                                                             aria-controls="toolbar"
-                                                                            onClick={e => handleClick(e, taskList.id, taskList.todo_id, task.id)}>
+                                                                            onClick={e => handleClick(e, taskList.id, taskList.todo_id, i, taskList.name)}>
                                                                         <img className={classes.btn} src={OptionIcon} />
                                                                     </IconButton>
                                                                 </div>

@@ -26,18 +26,6 @@ function useAuth(props){
             email: email,
             password: password
         }
-        // const response = await authService.login(payload)
-        // console.log(response.status)
-
-        // if(response.status == 200){
-        //     console.log('test')
-        //     const {data} = response;
-        //     setToken(data.auth_token);
-        //     await setLoginSuccess(true);
-        // } else {
-        //     await setLoginSuccess(false);
-        // }
-
         return await authService.login(payload)
     }
 
@@ -49,7 +37,6 @@ function useAuth(props){
         localforage.setItem("access_token", token);
         localforage.setItem("expire_date", expireDate)
 
-        console.log(expireDate)
         if(token !== null){
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             setIsAuthenticated(true);
@@ -66,7 +53,6 @@ function useAuth(props){
         } else {
             // Check if token expired
             if(expire_date <= new Date()){
-                console.log(test)
                 logout();
             } else {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;

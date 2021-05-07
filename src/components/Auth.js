@@ -76,7 +76,6 @@ const Auth = props => {
                 const {data, status} = response;
                 if(status == 200){
                     authContainer.setOpenSnackbar(true);
-                    console.log(data.auth_token)
                     authContainer.setToken(data.auth_token);
                     setTimeout(() => {
                         props.history.push('/home');

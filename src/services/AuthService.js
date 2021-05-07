@@ -1,5 +1,4 @@
 import axios from 'axios';
-import localforage from 'localforage';
 
 export default class AuthService{
     async login(data){

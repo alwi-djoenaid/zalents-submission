@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {createContainer} from 'unstated-next';
 import TodoService from '../services/TodoService';
-import localforage from 'localforage';
 
 function useTodo(props){
     const todoService = new TodoService();
@@ -17,7 +16,7 @@ function useTodo(props){
     const [taskListId, setTaskListId] = useState();
     const [taskListName, setTaskListName] = useState();
     const [taskListProgress, setTaskListProgress] = useState();
-    const [targetTaskListParent, setTargetTaskListParent] = useState();
+    const [targetTaskListParent, setTargetTaskListParent] = useState("");
     const [taskListParent, setTaskListParent] = useState();
 
     const getTodoList = () => {
@@ -42,7 +41,8 @@ function useTodo(props){
             target_todo_id: targetTaskListParent,
             name: taskListName
         }
-        return await todoService.editTaskList(taskListParentId, taskListId, payload);
+        console.log(payload)
+        //return await todoService.editTaskList(taskListParentId, taskListId, payload);
     }
 
     const deleteTaskList = async (taskListParentId, taskListId) => {

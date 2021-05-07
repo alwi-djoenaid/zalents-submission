@@ -20,9 +20,6 @@ const theme = createMuiTheme({
   typography: {
     fontFamily: 'Rubik, sans-serif'
   },
-  // button: {
-  //   fontFamily: 'Rubik, sans-serif'
-  // }
 })
 
 const app = (
