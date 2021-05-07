@@ -41,7 +41,7 @@ function useTodo(props){
             target_todo_id: targetTaskListParent,
             name: taskListName
         }
-        //console.log(payload)
+        console.log(payload)
         return await todoService.editTaskList(taskListParentId, taskListId, payload);
     }
 

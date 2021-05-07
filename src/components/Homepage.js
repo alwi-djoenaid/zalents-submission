@@ -299,12 +299,11 @@ const Homepage = props => {
     }
 
     const moveRight = () => {
-        TodoContainer.setTargetTaskListParent(TodoContainer.task[TodoContainer.targetTaskListParent + 1]);
+        TodoContainer.setTargetTaskListParent(TodoContainer.task[TodoContainer.targetTaskListParent + 1].id);
         
-        // setTimeout(() => {
-        //     editTaskItem();
-        // }, 2000);
-        
+        setTimeout(() => {
+            editTaskItem();
+        }, 2000);
     }
 
     const moveLeft = async () => {
