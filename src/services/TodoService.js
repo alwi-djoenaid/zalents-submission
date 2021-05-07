@@ -38,14 +38,13 @@ export default class TodoService{
         return response;
     }
 
-    async editTaskList(todoId, data){
+    async editTaskList(todoId, targetTodoId, data){
         let response;
         try{
-            response = await axios.patch(`https://todos-project-api.herokuapp.com/todos/${todoId}/items`, data)
+            response = await axios.patch(`https://todos-project-api.herokuapp.com/todos/${todoId}/items/${targetTodoId}`, data)
         } catch(e) {
             console.warn(e)
         }
-        console.log(response)
         return response;
     }
 
@@ -56,7 +55,6 @@ export default class TodoService{
         } catch(e) {
             console.warn(e)
         }
-        console.log(response)
         return response;
     }
 }

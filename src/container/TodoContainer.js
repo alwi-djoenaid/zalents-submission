@@ -17,7 +17,7 @@ function useTodo(props){
     const [taskListId, setTaskListId] = useState();
     const [taskListName, setTaskListName] = useState();
     const [taskListProgress, setTaskListProgress] = useState();
-    const [targetTodoId, setTargetTodoId] = useState();
+    const [targetTaskListParent, setTargetTaskListParent] = useState();
     const [taskListParent, setTaskListParent] = useState();
 
     const getTodoList = () => {
@@ -37,12 +37,12 @@ function useTodo(props){
         return await todoService.createTaskList(todoId, payload);
     }
 
-    const editTaskList = async (todoId) => {
+    const editTaskList = async (taskListParentId, taskListId) => {
         let payload = {
-            target_todo_id: targetTodoId,
+            target_todo_id: targetTaskListParent,
             name: taskListName
         }
-        return await todoService.editTaskList(payload, todoId);
+        return await todoService.editTaskList(taskListParentId, taskListId, payload);
     }
 
     const deleteTaskList = async (taskListParentId, taskListId) => {
@@ -62,8 +62,8 @@ function useTodo(props){
         setTaskListName,
         taskListProgress, 
         setTaskListProgress,
-        targetTodoId, 
-        setTargetTodoId,
+        targetTaskListParent, 
+        setTargetTaskListParent,
         taskListParent, 
         setTaskListParent,
         anchorElement,

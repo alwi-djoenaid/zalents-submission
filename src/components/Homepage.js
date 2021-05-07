@@ -182,13 +182,20 @@ const Homepage = props => {
     const id = open ? 'simple-popper' : undefined;
     const [openModal, setOpenModal] = useState(false);
     const [openModalDeleteTask, setOpenModalDeleteTask] = useState(false);
+    const [editModalClicked, setEditModalClicked] = useState(false)
     let subTask = [];
 
-    const handleOpen = (selected) => {
+    const handleOpenModalAddTask = (selected) => {
         TodoContainer.setSelectedTaskGroup(selected.target.value);
         console.log(selected.target.value, TodoContainer.selectedTaskGroup);
+        setEditModalClicked(false);
         setOpenModal(true);
     };
+
+    const handleOpenModalEditTask = () => {
+        setEditModalClicked(true);
+        setOpenModal(true)
+    }
 
     const handleClose = () => {
         setOpenModal(false);
@@ -205,7 +212,8 @@ const Homepage = props => {
     const handleClick = (event, id, taskListParent, todoId) => {
         TodoContainer.setTaskListId(id)
         TodoContainer.setTaskListParent(taskListParent);
-        TodoContainer.setTargetTodoId(todoId)
+        TodoContainer.setTargetTaskListParent(todoId);
+        console.log(TodoContainer.taskListParent, TodoContainer.targetTaskListParent)
         setAnchorEl(event.currentTarget);
       };
 
@@ -238,12 +246,9 @@ const Homepage = props => {
                         })
                     
                 })
-                console.log(subTask.length);
-                console.log(data)
             })
         };
-        loadData()
-        
+        loadData();
     }, [])
 
     const createTaskItem = async () => {
@@ -263,6 +268,30 @@ const Homepage = props => {
                     console.log(response);
                 })
         } else {
+            TodoContainer.setInputValid(false);
+            TodoContainer.setOpenSnackbar(true);
+        }
+    }
+
+    const editTaskItem = async () => {
+        if(TodoContainer.taskListName){
+            TodoContainer.setInputValid(true);
+            
+            await TodoContainer.editTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
+                .then(response => {
+                    console.log(response)
+                    if(response.status == 200){
+                        TodoContainer.setOpenSnackbar(true);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 4000);
+                    }
+                })
+                .catch(response => {
+                    console.log(response);
+                })
+        } else {
+            TodoContainer.setInputValid(false);
             TodoContainer.setOpenSnackbar(true);
         }
     }
@@ -274,7 +303,7 @@ const Homepage = props => {
             .then(response => {
                 setTimeout(() => {
                    window.location.reload() 
-                }, 3000);
+                }, 1000);
             })
             .catch(response => {
                 console.log(response)
@@ -292,7 +321,7 @@ const Homepage = props => {
         >
             <MenuItem className={classes.menuText}>Move Left</MenuItem>
             <MenuItem className={classes.menuText}>Move Right</MenuItem>
-            <MenuItem className={classes.menuText}>Edit</MenuItem>
+            <MenuItem className={classes.menuText} onClick={handleOpenModalEditTask}>Edit</MenuItem>
             <MenuItem className={classes.menuText} onClick={handleOpenModalDeleteTask}>Delete</MenuItem>
 
         </Menu>
@@ -352,7 +381,7 @@ const Homepage = props => {
                                                                             aria-label="show more"
                                                                             aria-haspopup="true"
                                                                             aria-controls="toolbar"
-                                                                            onClick={e => handleClick(e, taskList.id, taskList.todo_id, task)}>
+                                                                            onClick={e => handleClick(e, taskList.id, taskList.todo_id, task.id)}>
                                                                         <img className={classes.btn} src={OptionIcon} />
                                                                     </IconButton>
                                                                 </div>
@@ -362,7 +391,7 @@ const Homepage = props => {
                                                 }
                                             </div>
                                         )}
-                                            <Button value={task.id} type="button" onClick={selected => handleOpen(selected)}>
+                                            <Button value={task.id} type="button" onClick={selected => handleOpenModalAddTask(selected)}>
                                                 <div className={classes.addBtn}>
                                                     <div>
                                                         <img src={AddIcon} style={{marginTop: '5px'}}/>
@@ -393,7 +422,9 @@ const Homepage = props => {
             >
                 <Fade in={openModal}>
                     <div className={classes.paper}>
-                        <Typography className={classes.modalTitle} style={{marginTop: '12px'}} id="transition-modal-title">Create Task</Typography>
+                        <Typography className={classes.modalTitle} style={{marginTop: '12px'}} id="transition-modal-title">
+                            {!editModalClicked ? 'Create Task' : 'Edit Task'}
+                        </Typography>
                         <div>
                             <div >
                                 <p style={{marginBottom: '4px'}}>Task Name</p>
@@ -417,9 +448,20 @@ const Homepage = props => {
                                 <Button onClick={handleClose} variant="contained" style={{backgroundColor: '#FFFFFF', borderColor: '1px solid', color: '#262626', marginRight: '8px'}}>
                                     Cancel
                                 </Button>
-                                <Button onClick={() => createTaskItem()} variant="contained" style={{backgroundColor: '#27AE60', color: '#FFFFFF'}}>
-                                    Save Task
-                                </Button>
+                                {
+                                    !editModalClicked ?
+
+                                    <Button onClick={() => createTaskItem()} variant="contained" style={{backgroundColor: '#27AE60', color: '#FFFFFF'}}>
+                                        Save Task
+                                    </Button>
+
+                                    :
+
+                                    <Button onClick={() => editTaskItem()} variant="contained" style={{backgroundColor: '#27AE60', color: '#FFFFFF'}}>
+                                        Save Task
+                                    </Button>
+                                }
+                                
                             </div>
                         </div>
                     </div>
