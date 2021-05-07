@@ -1,12 +1,11 @@
-import { Backdrop, Button, Card, CardContent, ClickAwayListener, Container, Fade, Grid, Grow, Menu, MenuItem, MenuList, Modal, Paper, Popper, Snackbar, TextField, Typography } from '@material-ui/core';
+import { Backdrop, Button, Card, CardContent, ClickAwayListener, Container, Fade, Grid, Grow, IconButton, Menu, MenuItem, MenuList, Modal, Paper, Popper, Snackbar, TextField, Typography } from '@material-ui/core';
 import React, { useEffect , useRef, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import OptionIcon from '../assets/images/dots.png';
 import todoContainer from '../container/TodoContainer';
 import DoneIcon from '../assets/images/checklist.png';
-import CircleIcon from '../assets/images/circle.png';
-import PlusIcon from '../assets/images/plus.png';
 import AddIcon from '../assets/images/AddIcon.png';
+import ExclamationCircleIcon from '../assets/images/ExclamationCircle.png';
 import MuiAlert from '@material-ui/lab/Alert';
 
 const styles = makeStyles(theme => ({
@@ -98,6 +97,7 @@ const styles = makeStyles(theme => ({
         minWidth: '0'
     },
     optionBtn: {
+        minWidth: '0',
         height: '24px',
         width: '24px',
         float: 'right',
@@ -129,8 +129,7 @@ const styles = makeStyles(theme => ({
         fontWeight: 'normal'
     },
     addBtn: {
-        marginTop: '15px',
-        display: 'flex',
+        display: 'flex'
     },
     newTaskText: {
         color: '#2F3136',
@@ -139,7 +138,7 @@ const styles = makeStyles(theme => ({
         fontWeight: 'normal',
         top: '50%',
         paddingLeft: '9px',
-        paddingTop: '2px'
+        paddingTop: '7px'
     },
     modal: {
         display: 'flex',
@@ -156,7 +155,6 @@ const styles = makeStyles(theme => ({
         boxShadow: '0px 9px 28px 8px #0000000D'
     },
     modalTitle: {
-        marginTop: '12px',
         color: '#262626',
         fontSize: '16px',
         lineHeight: '24px',
@@ -164,6 +162,12 @@ const styles = makeStyles(theme => ({
     },
     modalTextField: {
         padding: '10px'
+    },
+    paperDeleteTask: {
+        backgroundColor: theme.palette.background.paper,
+        padding: '32px',
+        width: '400px',
+        height: '188px'
     }
 }))
 
@@ -175,23 +179,39 @@ const Homepage = props => {
     const open = Boolean(anchorEl);
     const prevOpen = useRef(open);
     const [placement, setPlacement] = useState();
-    const id = open ? 'transitions-popper' : undefined;
+    const id = open ? 'simple-popper' : undefined;
     const [openModal, setOpenModal] = useState(false);
+    const [openModalDeleteTask, setOpenModalDeleteTask] = useState(false);
     let subTask = [];
 
     const handleOpen = (selected) => {
-        TodoContainer.setSelectedTaskGroup(selected.currentTarget.value);
+        TodoContainer.setSelectedTaskGroup(selected.target.value);
         console.log(selected.target.value, TodoContainer.selectedTaskGroup);
         setOpenModal(true);
     };
 
     const handleClose = () => {
         setOpenModal(false);
+    };
+
+    const handleOpenModalDeleteTask = () => {
+        setOpenModalDeleteTask(true);
+    }
+
+    const handleCloseModalDeleteTask = () => {
+        setOpenModalDeleteTask(false);
+    }
+
+    const handleClick = (event, id, taskListParent, todoId) => {
+        TodoContainer.setTaskListId(id)
+        TodoContainer.setTaskListParent(taskListParent);
+        TodoContainer.setTargetTodoId(todoId)
+        setAnchorEl(event.currentTarget);
       };
 
-    const handleClick = (event) => {
-        setAnchorEl(anchorEl ? null : event.currentTarget);
-      };
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
 
     const openMenu = () => {
     }
@@ -203,7 +223,6 @@ const Homepage = props => {
     const Alert = props => {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
     }
-
 
     useEffect(() => {
         const loadData = async () => {
@@ -248,6 +267,37 @@ const Homepage = props => {
         }
     }
 
+    const deleteTaskItem = async () => {
+        console.log(TodoContainer.taskListParent)
+        console.log(TodoContainer.taskListId);
+        await TodoContainer.deleteTaskList(TodoContainer.taskListParent, TodoContainer.taskListId)
+            .then(response => {
+                setTimeout(() => {
+                   window.location.reload() 
+                }, 3000);
+            })
+            .catch(response => {
+                console.log(response)
+            })
+    }
+
+    const renderToolbar = (
+        <Menu anchorEl={anchorEl}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            id="toolbar"
+            keepMounted
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={open}
+            onClose={handleMenuClose}
+        >
+            <MenuItem className={classes.menuText}>Move Left</MenuItem>
+            <MenuItem className={classes.menuText}>Move Right</MenuItem>
+            <MenuItem className={classes.menuText}>Edit</MenuItem>
+            <MenuItem className={classes.menuText} onClick={handleOpenModalDeleteTask}>Delete</MenuItem>
+
+        </Menu>
+    )
+
     return(
         <div className={classes.root}>
             <div className={classes.wrapper}>
@@ -277,7 +327,7 @@ const Homepage = props => {
                                                     
                                                     && 
                                                     
-                                                    <Card className={classes.taskItemCard}>
+                                                    <Card key={taskList.id} className={classes.taskItemCard}>
                                                         <Typography className={classes.taskItemName}>{taskList.name}</Typography>
                                                         <div className={classes.bottom}>
                                                             <div className={classes.utility}>
@@ -298,35 +348,13 @@ const Homepage = props => {
                                                                 </div>
 
                                                                 <div className={classes.button}>
-                                                                    <Button className={classes.optionBtn} 
-                                                                            aria-describedby={id}
-                                                                            onClick={handleClick}>
+                                                                    <IconButton className={classes.optionBtn} 
+                                                                            aria-label="show more"
+                                                                            aria-haspopup="true"
+                                                                            aria-controls="toolbar"
+                                                                            onClick={e => handleClick(e, taskList.id, taskList.todo_id, task)}>
                                                                         <img className={classes.btn} src={OptionIcon} />
-                                                                    </Button>
-
-                                                                    <Popper open={open} id={id} anchorEl={anchorRef.current} transition >
-                                                                        {({TransitionProps}) => {
-                                                                            <Fade {...TransitionProps} timeout={350}>
-                                                                                <Paper>
-                                                                                    <ClickAwayListener onClickAway={handleClose}>
-                                                                                        <MenuList autoFocusItem={open} id="menu-list-grow">
-                                                                                        {
-                                                                                            i !== 0 
-                                                                            
-                                                                                            &&
-
-                                                                                            <MenuItem className={classes.menuText} onClick={handleClose}>Move Left</MenuItem>
-                                                                                        }
-                                                                        
-                                                                                            <MenuItem className={classes.menuText} onClick={handleClose}>Move Right</MenuItem>
-                                                                                            <MenuItem className={classes.menuText} onClick={handleClose}>Edit</MenuItem>
-                                                                                            <MenuItem className={classes.menuText} onClick={handleClose}>Delete</MenuItem>
-                                                                                        </MenuList>
-                                                                                    </ClickAwayListener>
-                                                                                </Paper>
-                                                                            </Fade>
-                                                                        }}
-                                                                    </Popper>
+                                                                    </IconButton>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -337,7 +365,7 @@ const Homepage = props => {
                                             <Button value={task.id} type="button" onClick={selected => handleOpen(selected)}>
                                                 <div className={classes.addBtn}>
                                                     <div>
-                                                        <img src={AddIcon}/>
+                                                        <img src={AddIcon} style={{marginTop: '5px'}}/>
                                                     </div>
                                                     <Typography className={classes.newTaskText}>New Task</Typography>
                                                 </div>
@@ -357,7 +385,7 @@ const Homepage = props => {
                 aria-describedby="transition-modal-description"
                 closeAfterTransition
                 open={openModal}
-                onClose={handleClose}
+                onClose={handleMenuClose}
                 BackdropComponent={Backdrop}
                 BackdropProps={{
                     timeout: 500,
@@ -365,7 +393,7 @@ const Homepage = props => {
             >
                 <Fade in={openModal}>
                     <div className={classes.paper}>
-                        <Typography className={classes.modalTitle} id="transition-modal-title">Create Task</Typography>
+                        <Typography className={classes.modalTitle} style={{marginTop: '12px'}} id="transition-modal-title">Create Task</Typography>
                         <div>
                             <div >
                                 <p style={{marginBottom: '4px'}}>Task Name</p>
@@ -397,6 +425,48 @@ const Homepage = props => {
                     </div>
                 </Fade>
             </Modal>
+
+            {/* Modal for delete existing task */}
+            <Modal
+                className={classes.modal}
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                closeAfterTransition
+                open={openModalDeleteTask}
+                onClose={handleMenuClose}
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}
+            >
+                <Fade in={openModalDeleteTask}>
+                    <div className={classes.paperDeleteTask}>
+                        <div style={{display: 'flex'}}>
+                            <div>
+                                <img src={ExclamationCircleIcon} />
+                            </div>
+                            <div style={{paddingLeft: '16px'}}>
+                                <Typography className={classes.modalTitle} id="transition-modal-title">Delete Task</Typography>
+                                <div>
+                                    <div >
+                                        <p style={{marginBottom: '4px'}}>Are you sure want to delete this task? your action can't be reverted.</p>
+                                    </div>
+                                    <div style={{paddingTop: '10px', float: 'right'}}>
+                                        <Button onClick={handleCloseModalDeleteTask} variant="contained" style={{backgroundColor: '#FFFFFF', borderColor: '1px solid', color: '#262626', marginRight: '8px'}}>
+                                            Cancel
+                                        </Button>
+                                        <Button onClick={deleteTaskItem} variant="contained" style={{backgroundColor: '#EB5757', color: '#FFFFFF'}}>
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </Fade>
+            </Modal>
             <Snackbar open={TodoContainer.openSnackbar} onClose={closeSnackbar} autoHideDuration={6000} anchorOrigin={{vertical: 'top', horizontal: 'center'}}>
                 {TodoContainer.inputValid ? 
                    <Alert severity="success">Task list has been created.</Alert> 
@@ -406,6 +476,7 @@ const Homepage = props => {
                 {/* <Alert severity="success">Task list has been deleted.</Alert>
                 <Alert severity="success">Task list has been updated.</Alert> */}
             </Snackbar>
+            {renderToolbar}
         </div>
         
     );

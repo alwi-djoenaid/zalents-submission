@@ -14,11 +14,14 @@ function useTodo(props){
     const [taskList, setTaskList] = useState([]);
 
     const [selectedTaskGroup, setSelectedTaskGroup] = useState();
+    const [taskListId, setTaskListId] = useState();
     const [taskListName, setTaskListName] = useState();
     const [taskListProgress, setTaskListProgress] = useState();
+    const [targetTodoId, setTargetTodoId] = useState();
+    const [taskListParent, setTaskListParent] = useState();
 
     const getTodoList = () => {
-        return todoService.getTodoList()
+        return todoService.getTodoList();
     }
 
     const getTaskItem = (todoId) => {
@@ -34,6 +37,18 @@ function useTodo(props){
         return await todoService.createTaskList(todoId, payload);
     }
 
+    const editTaskList = async (todoId) => {
+        let payload = {
+            target_todo_id: targetTodoId,
+            name: taskListName
+        }
+        return await todoService.editTaskList(payload, todoId);
+    }
+
+    const deleteTaskList = async (taskListParentId, taskListId) => {
+        return await todoService.deleteTaskList(taskListParentId, taskListId);
+    }
+
     return{
         task, 
         setTask,
@@ -41,10 +56,16 @@ function useTodo(props){
         setTaskList,
         selectedTaskGroup, 
         setSelectedTaskGroup,
+        taskListId, 
+        setTaskListId,
         taskListName, 
         setTaskListName,
         taskListProgress, 
         setTaskListProgress,
+        targetTodoId, 
+        setTargetTodoId,
+        taskListParent, 
+        setTaskListParent,
         anchorElement,
         setAnchorElement,
         open, 
@@ -55,7 +76,9 @@ function useTodo(props){
         setInputValid,
         getTodoList,
         getTaskItem,
-        createTaskItem
+        createTaskItem,
+        editTaskList,
+        deleteTaskList
     };
 }
 

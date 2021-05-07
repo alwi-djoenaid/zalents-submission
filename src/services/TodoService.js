@@ -38,5 +38,25 @@ export default class TodoService{
         return response;
     }
 
-    async 
+    async editTaskList(todoId, data){
+        let response;
+        try{
+            response = await axios.patch(`https://todos-project-api.herokuapp.com/todos/${todoId}/items`, data)
+        } catch(e) {
+            console.warn(e)
+        }
+        console.log(response)
+        return response;
+    }
+
+    async deleteTaskList(todoId, taskListId){
+        let response;
+        try{
+            response = await axios.delete(`https://todos-project-api.herokuapp.com/todos/${todoId}/items/${taskListId}`)
+        } catch(e) {
+            console.warn(e)
+        }
+        console.log(response)
+        return response;
+    }
 }
